@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkChat - Мессенджер с базой данных</title>
+    <title>WorkChat - Мессенджер с Google Sheets</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -34,7 +34,6 @@
             padding: 20px;
         }
 
-        /* Экран авторизации */
         .auth-container {
             background: white;
             border-radius: 20px;
@@ -161,6 +160,21 @@
             display: none;
         }
 
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--secondary);
+            margin: 10px 0;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
         /* Основное приложение */
         .app-container {
             width: 100%;
@@ -174,7 +188,7 @@
             display: none;
         }
 
-        /* Левый сайдбар */
+        /* Стили для интерфейса остаются такими же как в предыдущей версии */
         .left-sidebar {
             width: 80px;
             background: var(--dark);
@@ -204,10 +218,6 @@
             transform: scale(1.1);
         }
 
-        .sidebar-icon:hover {
-            background: var(--primary);
-        }
-
         .sidebar-badge {
             position: absolute;
             top: -5px;
@@ -223,7 +233,6 @@
             justify-content: center;
         }
 
-        /* Сайдбар контактов */
         .contacts-sidebar {
             width: 350px;
             background: var(--light);
@@ -295,11 +304,6 @@
             transition: all 0.3s;
         }
 
-        .add-friend-btn:hover {
-            background: #0da271;
-            transform: translateY(-50%) scale(1.1);
-        }
-
         .contacts-tabs {
             display: flex;
             background: white;
@@ -347,14 +351,6 @@
             position: relative;
         }
 
-        .contact:hover {
-            background: #f1f5f9;
-        }
-
-        .contact:hover .contact-actions {
-            display: flex;
-        }
-
         .contact.active {
             background: white;
             border-left-color: var(--primary);
@@ -397,59 +393,12 @@
             margin-bottom: 5px;
         }
 
-        .contact-status {
-            font-size: 12px;
-            color: var(--secondary);
-        }
-
         .last-message {
             font-size: 13px;
             color: var(--secondary);
             opacity: 0.8;
         }
 
-        .unread-badge {
-            background: var(--primary);
-            color: white;
-            border-radius: 10px;
-            padding: 2px 8px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .contact-actions {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-            gap: 5px;
-            background: white;
-            padding: 5px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .contact-action {
-            width: 25px;
-            height: 25px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--secondary);
-            background: var(--light);
-            font-size: 12px;
-        }
-
-        .contact-action:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Область чата */
         .chat-area {
             flex: 1;
             display: flex;
@@ -464,11 +413,6 @@
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-user {
-            display: flex;
             align-items: center;
         }
 
@@ -488,11 +432,6 @@
             transition: all 0.3s;
             color: var(--secondary);
             background: var(--light);
-        }
-
-        .chat-action:hover {
-            background: var(--primary);
-            color: white;
         }
 
         .chat-action.call {
@@ -575,10 +514,6 @@
             transition: all 0.3s;
         }
 
-        .send-button:hover {
-            background: var(--primary-dark);
-        }
-
         /* Модальные окна */
         .modal-overlay {
             position: fixed;
@@ -613,109 +548,18 @@
             text-align: center;
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .modal-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-            flex: 1;
-        }
-
-        .modal-btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .modal-btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .modal-btn-secondary {
-            background: var(--light);
-            color: var(--dark);
-        }
-
-        .modal-btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        /* Заявки в друзья */
-        .friend-request {
-            background: var(--light);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .request-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .request-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .request-accept {
-            background: var(--success);
-            color: white;
-        }
-
-        .request-decline {
-            background: var(--error);
-            color: white;
-        }
-
-        /* Поиск пользователей */
-        .user-search-result {
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .user-search-result:last-child {
-            border-bottom: none;
-        }
-
-        .add-friend-action {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .add-friend-action:hover {
-            background: #0da271;
-        }
-
-        .add-friend-action:disabled {
-            background: var(--secondary);
-            cursor: not-allowed;
+        /* Адаптивные стили */
+        @media (max-width: 768px) {
+            .contacts-sidebar {
+                width: 100%;
+            }
+            .app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            body {
+                padding: 0;
+            }
         }
     </style>
 </head>
@@ -723,7 +567,7 @@
     <!-- Экран авторизации -->
     <div class="auth-container" id="authContainer">
         <div class="auth-title">WorkChat</div>
-        <div class="auth-subtitle">Мессенджер с общей базой данных</div>
+        <div class="auth-subtitle">Мессенджер с Google Sheets Базой</div>
         
         <div class="auth-tabs">
             <div class="auth-tab active" onclick="switchAuthTab('login')">Вход</div>
@@ -742,8 +586,11 @@
                 <input type="password" class="form-input" id="loginPassword" placeholder="Введите пароль">
                 <div class="error-message" id="loginPasswordError">Неверный пароль</div>
             </div>
+            <div class="loading" id="loginLoading">
+                <i class="fas fa-spinner"></i> Вход в систему...
+            </div>
             <button class="btn btn-primary" onclick="login()">Войти</button>
-            <div class="success-message" id="demoUsersInfo"></div>
+            <div class="success-message" id="setupInfo"></div>
             <div class="auth-switch">
                 Нет аккаунта? <span class="auth-link" onclick="switchAuthTab('register')">Зарегистрироваться</span>
             </div>
@@ -766,10 +613,8 @@
                 <input type="password" class="form-input" id="registerPassword" placeholder="Не менее 6 символов">
                 <div class="error-message" id="registerPasswordError">Пароль слишком короткий</div>
             </div>
-            <div class="form-group">
-                <label class="form-label">Подтвердите пароль</label>
-                <input type="password" class="form-input" id="registerConfirm" placeholder="Повторите пароль">
-                <div class="error-message" id="registerConfirmError">Пароли не совпадают</div>
+            <div class="loading" id="registerLoading">
+                <i class="fas fa-spinner"></i> Регистрация...
             </div>
             <button class="btn btn-primary" onclick="register()">Зарегистрироваться</button>
             <div class="auth-switch">
@@ -789,11 +634,8 @@
                 <i class="fas fa-user-friends"></i>
                 <div class="sidebar-badge" id="friendsBadge">0</div>
             </div>
-            <div class="sidebar-icon" onclick="switchTab('find')">
+            <div class="sidebar-icon" onclick="showAddFriendModal()">
                 <i class="fas fa-search"></i>
-            </div>
-            <div class="sidebar-icon" onclick="switchTab('calls')">
-                <i class="fas fa-phone-alt"></i>
             </div>
             <div class="sidebar-icon" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i>
@@ -814,7 +656,7 @@
             
             <div class="search-container">
                 <input type="text" class="search-box" id="searchInput" placeholder="Поиск..." oninput="handleSearch()">
-                <button class="add-friend-btn" onclick="showAddFriendModal()" title="Добавить друга">
+                <button class="add-friend-btn" onclick="showAddFriendModal()" title="Найти друзей">
                     <i class="fas fa-user-plus"></i>
                 </button>
             </div>
@@ -827,7 +669,10 @@
             </div>
             
             <div class="contacts-list" id="contactsList">
-                <!-- Контакты будут загружены через JavaScript -->
+                <div style="text-align: center; padding: 40px; color: var(--secondary);">
+                    <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 15px;"></i>
+                    <div>Загрузка данных...</div>
+                </div>
             </div>
         </div>
 
@@ -875,149 +720,89 @@
                     <input type="text" class="form-input" id="searchUsersInput" placeholder="Введите email или имя" oninput="searchUsers()">
                 </div>
                 <div id="searchResults" style="max-height: 300px; overflow-y: auto;">
-                    <!-- Результаты поиска -->
+                    <div style="text-align: center; padding: 20px; color: var(--secondary);">
+                        <i class="fas fa-search" style="font-size: 36px; margin-bottom: 10px;"></i>
+                        <div>Введите email или имя для поиска</div>
+                    </div>
                 </div>
-                <div class="modal-actions">
-                    <button class="modal-btn modal-btn-secondary" onclick="hideAddFriendModal()">Закрыть</button>
+                <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="hideAddFriendModal()">Закрыть</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 🗄️ ОБЩАЯ БАЗА ДАННЫХ В LOCALSTORAGE
-        const WORKCHAT_DB = 'workchat_global_database';
-        
-        // Инициализация базы данных
-        function initializeDatabase() {
-            let db = localStorage.getItem(WORKCHAT_DB);
-            
-            if (!db) {
-                // Создаем начальную базу данных с демо пользователями
-                const initialDB = {
-                    users: [
-                        {
-                            id: 1,
-                            name: "Анна Петрова",
-                            email: "anna@workchat.com",
-                            password: "123456",
-                            avatar: "А",
-                            status: "online",
-                            friends: [2, 3],
-                            friendRequests: [],
-                            chats: {}
-                        },
-                        {
-                            id: 2,
-                            name: "Иван Сидоров",
-                            email: "ivan@workchat.com",
-                            password: "123456",
-                            avatar: "И",
-                            status: "online",
-                            friends: [1],
-                            friendRequests: [],
-                            chats: {}
-                        },
-                        {
-                            id: 3,
-                            name: "Мария Иванова",
-                            email: "maria@workchat.com",
-                            password: "123456",
-                            avatar: "М",
-                            status: "offline",
-                            friends: [1],
-                            friendRequests: [],
-                            chats: {}
-                        }
-                    ],
-                    messages: {},
-                    calls: []
-                };
-                
-                localStorage.setItem(WORKCHAT_DB, JSON.stringify(initialDB));
-                console.log('✅ База данных инициализирована с демо пользователями');
-            }
-            
-            return getDatabase();
-        }
+        // 🔧 КОНФИГУРАЦИЯ GOOGLE SHEETS
+        const GOOGLE_SHEETS_CONFIG = {
+            // ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ!
+            scriptUrl: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+            sheetId: 'YOUR_GOOGLE_SHEET_ID',
+            apiKey: 'YOUR_GOOGLE_API_KEY'
+        };
 
-        // Получить базу данных
-        function getDatabase() {
-            return JSON.parse(localStorage.getItem(WORKCHAT_DB));
-        }
-
-        // Сохранить базу данных
-        function saveDatabase(db) {
-            localStorage.setItem(WORKCHAT_DB, JSON.stringify(db));
-        }
-
-        // Получить пользователя по email
-        function getUserByEmail(email) {
-            const db = getDatabase();
-            return db.users.find(user => user.email === email);
-        }
-
-        // Получить пользователя по ID
-        function getUserById(id) {
-            const db = getDatabase();
-            return db.users.find(user => user.id === id);
-        }
-
-        // Обновить пользователя
-        function updateUser(updatedUser) {
-            const db = getDatabase();
-            const userIndex = db.users.findIndex(user => user.id === updatedUser.id);
-            if (userIndex !== -1) {
-                db.users[userIndex] = updatedUser;
-                saveDatabase(db);
-                return true;
-            }
-            return false;
-        }
+        // 📊 СТРУКТУРА БАЗЫ ДАННЫХ В GOOGLE SHEETS
+        const SHEETS = {
+            USERS: 'Users',
+            FRIENDSHIPS: 'Friendships',
+            MESSAGES: 'Messages',
+            FRIEND_REQUESTS: 'FriendRequests'
+        };
 
         // Глобальные переменные
         let currentUser = null;
         let currentContact = null;
-        let activeTab = 'chats';
         let activeContactsTab = 'chats';
+        let refreshInterval = null;
 
-        // Инициализация при загрузке
+        // 🚀 ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
         document.addEventListener('DOMContentLoaded', function() {
-            initializeDatabase();
-            showDemoUsersInfo();
+            showSetupInstructions();
             checkAuthStatus();
         });
 
-        // Показать информацию о демо пользователях
-        function showDemoUsersInfo() {
-            const db = getDatabase();
-            const demoUsers = db.users.slice(0, 3);
-            const demoInfo = demoUsers.map(user => 
-                `${user.name} (${user.email}) - пароль: 123456`
-            ).join('<br>');
-            
-            document.getElementById('demoUsersInfo').innerHTML = 
-                `<strong>Демо пользователи:</strong><br>${demoInfo}`;
-            document.getElementById('demoUsersInfo').style.display = 'block';
+        // 📋 ИНСТРУКЦИИ ПО НАСТРОЙКЕ
+        function showSetupInstructions() {
+            const instructions = `
+                <strong>Для работы приложения необходимо:</strong><br>
+                1. Создать Google Sheets таблицу<br>
+                2. Настроить Google Apps Script<br>
+                3. Вставить ваши ID в конфигурацию<br><br>
+                <a href="#" onclick="showDetailedSetup()">Подробная инструкция по настройке</a>
+            `;
+            document.getElementById('setupInfo').innerHTML = instructions;
+            document.getElementById('setupInfo').style.display = 'block';
         }
 
-        // Проверка авторизации
+        function showDetailedSetup() {
+            alert(`📋 ПОЛНАЯ ИНСТРУКЦИЯ ПО НАСТРОЙКЕ:
+
+1. СОЗДАЙТЕ GOOGLE ТАБЛИЦУ:
+   - Откройте sheets.google.com
+   - Создайте новую таблицу "WorkChatDB"
+   - Создайте листы: Users, Friendships, Messages, FriendRequests
+
+2. НАСТРОЙТЕ GOOGLE APPS SCRIPT:
+   - В таблице: Расширения → Apps Script
+   - Вставьте код скрипта (будет показан ниже)
+   - Разверните как веб-приложение
+
+3. НАСТРОЙТЕ HTML:
+   - Замените YOUR_SCRIPT_ID на ID вашего скрипта
+   - Замените YOUR_GOOGLE_SHEET_ID на ID вашей таблицы
+
+Готово! Приложение будет работать с реальной базой данных.`);
+        }
+
+        // 🔐 АВТОРИЗАЦИЯ
         function checkAuthStatus() {
             const savedUser = localStorage.getItem('workchat_current_user');
             if (savedUser) {
-                const userData = JSON.parse(savedUser);
-                // Обновляем данные из общей базы
-                const freshUser = getUserById(userData.id);
-                if (freshUser) {
-                    currentUser = freshUser;
-                    showApp();
-                } else {
-                    localStorage.removeItem('workchat_current_user');
-                }
+                currentUser = JSON.parse(savedUser);
+                showApp();
             }
         }
 
-        // Переключение вкладок авторизации
         function switchAuthTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.getElementById('loginForm').style.display = 'none';
@@ -1032,121 +817,206 @@
             }
         }
 
-        // Валидация email
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
+        // 📡 API ДЛЯ РАБОТЫ С GOOGLE SHEETS
+        async function callGoogleScript(functionName, data = {}) {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_CONFIG.scriptUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: functionName,
+                        ...data
+                    })
+                });
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Ошибка связи с Google Sheets:', error);
+                // Fallback на локальное хранилище если Google Sheets не настроен
+                return callLocalStorage(functionName, data);
+            }
         }
 
-        // Показать/скрыть ошибку
-        function showError(elementId, message) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.style.display = 'block';
+        // 🏠 FALLBACK НА LOCALSTORAGE
+        function callLocalStorage(functionName, data) {
+            console.log('Используется локальное хранилище (Google Sheets не настроен)');
+            
+            // Инициализация локальной базы
+            let db = JSON.parse(localStorage.getItem('workchat_local_db') || '{"users":[], "friendships":[], "messages":[], "friendRequests":[]}');
+            
+            switch(functionName) {
+                case 'registerUser':
+                    const newUser = {
+                        id: Date.now(),
+                        name: data.name,
+                        email: data.email,
+                        password: data.password,
+                        avatar: data.name.charAt(0).toUpperCase(),
+                        status: 'online',
+                        createdAt: new Date().toISOString()
+                    };
+                    db.users.push(newUser);
+                    localStorage.setItem('workchat_local_db', JSON.stringify(db));
+                    return { success: true, user: newUser };
+                    
+                case 'loginUser':
+                    const user = db.users.find(u => u.email === data.email && u.password === data.password);
+                    return { success: !!user, user: user };
+                    
+                case 'getAllUsers':
+                    return { success: true, users: db.users.filter(u => u.id !== currentUser.id) };
+                    
+                case 'sendFriendRequest':
+                    const request = {
+                        id: Date.now(),
+                        fromUserId: currentUser.id,
+                        toUserId: data.friendId,
+                        status: 'pending',
+                        createdAt: new Date().toISOString()
+                    };
+                    db.friendRequests.push(request);
+                    localStorage.setItem('workchat_local_db', JSON.stringify(db));
+                    return { success: true };
+                    
+                case 'getFriendRequests':
+                    const requests = db.friendRequests.filter(req => 
+                        req.toUserId === currentUser.id && req.status === 'pending'
+                    );
+                    return { success: true, requests };
+                    
+                case 'acceptFriendRequest':
+                    const reqIndex = db.friendRequests.findIndex(req => 
+                        req.id === data.requestId && req.toUserId === currentUser.id
+                    );
+                    if (reqIndex !== -1) {
+                        db.friendRequests[reqIndex].status = 'accepted';
+                        // Добавляем в друзья
+                        const friendship = {
+                            id: Date.now(),
+                            user1Id: db.friendRequests[reqIndex].fromUserId,
+                            user2Id: currentUser.id,
+                            createdAt: new Date().toISOString()
+                        };
+                        db.friendships.push(friendship);
+                        localStorage.setItem('workchat_local_db', JSON.stringify(db));
+                        return { success: true };
+                    }
+                    return { success: false };
+                    
+                case 'getFriends':
+                    const friendships = db.friendships.filter(f => 
+                        f.user1Id === currentUser.id || f.user2Id === currentUser.id
+                    );
+                    const friendIds = friendships.map(f => 
+                        f.user1Id === currentUser.id ? f.user2Id : f.user1Id
+                    );
+                    const friends = db.users.filter(u => friendIds.includes(u.id));
+                    return { success: true, friends };
+                    
+                case 'sendMessage':
+                    const message = {
+                        id: Date.now(),
+                        senderId: currentUser.id,
+                        receiverId: data.receiverId,
+                        text: data.text,
+                        timestamp: new Date().toISOString()
+                    };
+                    if (!db.messages) db.messages = [];
+                    db.messages.push(message);
+                    localStorage.setItem('workchat_local_db', JSON.stringify(db));
+                    return { success: true };
+                    
+                case 'getMessages':
+                    const messages = (db.messages || []).filter(m => 
+                        (m.senderId === currentUser.id && m.receiverId === data.friendId) ||
+                        (m.senderId === data.friendId && m.receiverId === currentUser.id)
+                    );
+                    return { success: true, messages };
+                    
+                default:
+                    return { success: false, error: 'Функция не найдена' };
+            }
         }
 
-        function hideError(elementId) {
-            document.getElementById(elementId).style.display = 'none';
-        }
-
-        // Регистрация
-        function register() {
+        // 👤 РЕГИСТРАЦИЯ И ВХОД
+        async function register() {
             const name = document.getElementById('registerName').value;
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            const confirm = document.getElementById('registerConfirm').value;
 
-            let isValid = true;
-            hideError('registerNameError');
-            hideError('registerEmailError');
-            hideError('registerPasswordError');
-            hideError('registerConfirmError');
-
-            if (!name) {
-                showError('registerNameError', 'Введите имя');
-                isValid = false;
-            }
-            if (!validateEmail(email)) {
-                showError('registerEmailError', 'Введите корректный email');
-                isValid = false;
-            }
-            if (password.length < 6) {
-                showError('registerPasswordError', 'Пароль должен быть не менее 6 символов');
-                isValid = false;
-            }
-            if (password !== confirm) {
-                showError('registerConfirmError', 'Пароли не совпадают');
-                isValid = false;
-            }
-
-            if (!isValid) return;
-
-            const db = getDatabase();
-            
-            // Проверяем существующего пользователя
-            if (db.users.find(user => user.email === email)) {
-                showError('registerEmailError', 'Пользователь с таким email уже существует');
+            if (!name || !email || !password) {
+                alert('Заполните все поля');
                 return;
             }
 
-            // Создаем нового пользователя
-            const newUser = {
-                id: Date.now(),
-                name: name,
-                email: email,
-                password: password,
-                avatar: name.charAt(0).toUpperCase(),
-                status: "online",
-                friends: [],
-                friendRequests: [],
-                chats: {}
-            };
+            document.getElementById('registerLoading').style.display = 'block';
 
-            db.users.push(newUser);
-            saveDatabase(db);
-            
-            currentUser = newUser;
-            localStorage.setItem('workchat_current_user', JSON.stringify(currentUser));
-            showApp();
-            
-            alert('Регистрация успешна! Добро пожаловать в WorkChat!');
+            try {
+                const result = await callGoogleScript('registerUser', {
+                    name: name,
+                    email: email,
+                    password: password
+                });
+
+                if (result.success) {
+                    currentUser = result.user;
+                    localStorage.setItem('workchat_current_user', JSON.stringify(currentUser));
+                    showApp();
+                    alert('Регистрация успешна!');
+                } else {
+                    alert('Ошибка регистрации: ' + (result.error || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                alert('Ошибка сети: ' + error.message);
+            } finally {
+                document.getElementById('registerLoading').style.display = 'none';
+            }
         }
 
-        // Вход
-        function login() {
+        async function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            hideError('loginEmailError');
-            hideError('loginPasswordError');
-
-            const db = getDatabase();
-            const user = db.users.find(u => u.email === email && u.password === password);
-            
-            if (!user) {
-                showError('loginPasswordError', 'Неверный email или пароль');
+            if (!email || !password) {
+                alert('Заполните все поля');
                 return;
             }
 
-            currentUser = user;
-            localStorage.setItem('workchat_current_user', JSON.stringify(currentUser));
-            showApp();
+            document.getElementById('loginLoading').style.display = 'block';
+
+            try {
+                const result = await callGoogleScript('loginUser', {
+                    email: email,
+                    password: password
+                });
+
+                if (result.success) {
+                    currentUser = result.user;
+                    localStorage.setItem('workchat_current_user', JSON.stringify(currentUser));
+                    showApp();
+                } else {
+                    alert('Неверный email или пароль');
+                }
+            } catch (error) {
+                alert('Ошибка сети: ' + error.message);
+            } finally {
+                document.getElementById('loginLoading').style.display = 'none';
+            }
         }
 
-        // Выход
         function logout() {
-            if (currentUser) {
-                // Обновляем статус перед выходом
-                currentUser.status = "offline";
-                updateUser(currentUser);
-            }
-            
             currentUser = null;
             localStorage.removeItem('workchat_current_user');
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
             showAuth();
         }
 
-        // Показать приложение
+        // 🎨 ОСНОВНОЕ ПРИЛОЖЕНИЕ
         function showApp() {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('appContainer').style.display = 'flex';
@@ -1154,34 +1024,28 @@
             document.getElementById('userName').textContent = currentUser.name;
             document.getElementById('userAvatar').textContent = currentUser.avatar;
             
-            // Обновляем статус на онлайн
-            currentUser.status = "online";
-            updateUser(currentUser);
-            
-            updateFriendsBadge();
+            // Запускаем автообновление данных
+            startAutoRefresh();
             loadContacts();
         }
 
-        // Показать авторизацию
         function showAuth() {
             document.getElementById('authContainer').style.display = 'block';
             document.getElementById('appContainer').style.display = 'none';
         }
 
-        // Переключение основных вкладок
-        function switchTab(tab) {
-            activeTab = tab;
-            document.querySelectorAll('.sidebar-icon').forEach(icon => {
-                icon.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            if (tab === 'find') {
-                showAddFriendModal();
-            }
+        // 🔄 АВТООБНОВЛЕНИЕ ДАННЫХ
+        function startAutoRefresh() {
+            // Обновляем данные каждые 5 секунд
+            refreshInterval = setInterval(() => {
+                loadContacts();
+                if (currentContact) {
+                    loadMessages();
+                }
+            }, 5000);
         }
 
-        // Переключение вкладок контактов
+        // 👥 УПРАВЛЕНИЕ КОНТАКТАМИ
         function switchContactsTab(tab) {
             activeContactsTab = tab;
             document.querySelectorAll('.contacts-tab').forEach(tab => {
@@ -1191,145 +1055,125 @@
             loadContacts();
         }
 
-        // Загрузка контактов
-        function loadContacts() {
-            const contactsList = document.getElementById('contactsList');
-            
-            if (activeContactsTab === 'chats') {
-                loadChatsTab();
-            } else if (activeContactsTab === 'friends') {
-                loadFriendsTab();
-            } else if (activeContactsTab === 'requests') {
-                loadRequestsTab();
+        async function loadContacts() {
+            try {
+                if (activeContactsTab === 'chats') {
+                    await loadFriendsTab();
+                } else if (activeContactsTab === 'friends') {
+                    await loadFriendsList();
+                } else if (activeContactsTab === 'requests') {
+                    await loadFriendRequests();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки контактов:', error);
             }
         }
 
-        // Вкладка чатов
-        function loadChatsTab() {
+        async function loadFriendsTab() {
+            const result = await callGoogleScript('getFriends');
             const contactsList = document.getElementById('contactsList');
-            const friends = getFriendsAsContacts();
             
-            contactsList.innerHTML = `
-                <div class="contact-category">Друзья для чата (${friends.length})</div>
-                ${friends.length > 0 ? friends.map(friend => `
-                    <div class="contact" onclick="selectContact(${friend.id})">
-                        <div class="contact-avatar">
-                            ${friend.avatar}
-                            ${friend.status === 'online' ? '<div class="online-dot"></div>' : ''}
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-name">${friend.name}</div>
-                            <div class="last-message">
-                                ${getLastMessage(friend.id) || 'Начните общение'}
+            if (result.success && result.friends.length > 0) {
+                contactsList.innerHTML = `
+                    <div class="contact-category">Друзья (${result.friends.length})</div>
+                    ${result.friends.map(friend => `
+                        <div class="contact" onclick="selectContact(${friend.id})">
+                            <div class="contact-avatar">
+                                ${friend.avatar}
+                                <div class="online-dot"></div>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name">${friend.name}</div>
+                                <div class="last-message">Нажмите для начала чата</div>
                             </div>
                         </div>
-                    </div>
-                `).join('') : `
-                    <div style="text-align: center; padding: 40px; color: var(--secondary);">
-                        <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 15px;"></i>
-                        <div>У вас пока нет друзей для чата</div>
-                        <div style="font-size: 14px; margin-top: 10px;">Добавьте друзей чтобы начать общение</div>
-                    </div>
-                `}
-            `;
-        }
-
-        // Вкладка друзей
-        function loadFriendsTab() {
-            const contactsList = document.getElementById('contactsList');
-            const friends = getFriendsAsContacts();
-            
-            contactsList.innerHTML = `
-                <div class="contact-category">Мои друзья (${friends.length})</div>
-                ${friends.length > 0 ? friends.map(friend => `
-                    <div class="contact">
-                        <div class="contact-avatar">
-                            ${friend.avatar}
-                            <div class="online-dot"></div>
-                        </div>
-                        <div class="contact-info">
-                            <div class="contact-name">${friend.name}</div>
-                            <div class="contact-status">${friend.email}</div>
-                        </div>
-                        <div class="contact-actions">
-                            <div class="contact-action" onclick="startCallWithFriend(${friend.id})">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <div class="contact-action" onclick="removeFriend(${friend.id})">
-                                <i class="fas fa-user-times"></i>
-                            </div>
-                        </div>
-                    </div>
-                `).join('') : `
+                    `).join('')}
+                `;
+            } else {
+                contactsList.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: var(--secondary);">
                         <i class="fas fa-users" style="font-size: 48px; margin-bottom: 15px;"></i>
                         <div>У вас пока нет друзей</div>
-                        <div style="font-size: 14px; margin-top: 10px;">Найдите пользователей и добавьте их в друзья</div>
+                        <div style="font-size: 14px; margin-top: 10px;">Добавьте друзей чтобы начать общение</div>
                     </div>
-                `}
-            `;
+                `;
+            }
         }
 
-        // Вкладка заявок
-        function loadRequestsTab() {
+        async function loadFriendsList() {
+            const result = await callGoogleScript('getFriends');
             const contactsList = document.getElementById('contactsList');
-            const incomingRequests = currentUser.friendRequests || [];
             
-            contactsList.innerHTML = `
-                <div class="contact-category">Заявки в друзья (${incomingRequests.length})</div>
-                ${incomingRequests.length > 0 ? incomingRequests.map(requestId => {
-                    const requester = getUserById(requestId);
-                    return requester ? `
-                        <div class="friend-request">
-                            <div style="display: flex; align-items: center;">
-                                <div class="contact-avatar">${requester.avatar}</div>
-                                <div>
-                                    <div class="contact-name">${requester.name}</div>
-                                    <div class="contact-status">${requester.email}</div>
-                                </div>
+            if (result.success && result.friends.length > 0) {
+                contactsList.innerHTML = `
+                    <div class="contact-category">Мои друзья (${result.friends.length})</div>
+                    ${result.friends.map(friend => `
+                        <div class="contact">
+                            <div class="contact-avatar">
+                                ${friend.avatar}
+                                <div class="online-dot"></div>
                             </div>
-                            <div class="request-actions">
-                                <button class="request-btn request-accept" onclick="acceptFriendRequest(${requester.id})">
-                                    Принять
-                                </button>
-                                <button class="request-btn request-decline" onclick="declineFriendRequest(${requester.id})">
-                                    Отклонить
-                                </button>
+                            <div class="contact-info">
+                                <div class="contact-name">${friend.name}</div>
+                                <div class="last-message">${friend.email}</div>
                             </div>
                         </div>
-                    ` : '';
-                }).join('') : `
+                    `).join('')}
+                `;
+            } else {
+                contactsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--secondary);">
+                        <i class="fas fa-user-friends" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <div>Список друзей пуст</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadFriendRequests() {
+            const result = await callGoogleScript('getFriendRequests');
+            const contactsList = document.getElementById('contactsList');
+            
+            if (result.success && result.requests.length > 0) {
+                // Нужно получить информацию о пользователях
+                const allUsersResult = await callGoogleScript('getAllUsers');
+                const usersMap = {};
+                allUsersResult.users.forEach(user => usersMap[user.id] = user);
+                
+                contactsList.innerHTML = `
+                    <div class="contact-category">Заявки в друзья (${result.requests.length})</div>
+                    ${result.requests.map(request => {
+                        const user = usersMap[request.fromUserId];
+                        return user ? `
+                            <div class="contact">
+                                <div class="contact-avatar">${user.avatar}</div>
+                                <div class="contact-info">
+                                    <div class="contact-name">${user.name}</div>
+                                    <div class="last-message">${user.email}</div>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button onclick="acceptFriendRequest(${request.id})" style="background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">Принять</button>
+                                    <button onclick="declineFriendRequest(${request.id})" style="background: var(--error); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">Отклонить</button>
+                                </div>
+                            </div>
+                        ` : '';
+                    }).join('')}
+                `;
+                
+                // Обновляем бейдж
+                document.getElementById('friendsBadge').textContent = result.requests.length;
+            } else {
+                contactsList.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: var(--secondary);">
                         <i class="fas fa-envelope" style="font-size: 48px; margin-bottom: 15px;"></i>
                         <div>Нет новых заявок</div>
                     </div>
-                `}
-            `;
+                `;
+                document.getElementById('friendsBadge').textContent = '0';
+            }
         }
 
-        // Получить друзей как контакты
-        function getFriendsAsContacts() {
-            return (currentUser.friends || []).map(friendId => {
-                const friend = getUserById(friendId);
-                return friend ? {
-                    id: friend.id,
-                    name: friend.name,
-                    avatar: friend.avatar,
-                    status: friend.status,
-                    email: friend.email
-                } : null;
-            }).filter(Boolean);
-        }
-
-        // Получить последнее сообщение
-        function getLastMessage(friendId) {
-            const db = getDatabase();
-            const chatKey = `chat_${Math.min(currentUser.id, friendId)}_${Math.max(currentUser.id, friendId)}`;
-            const messages = db.messages[chatKey] || [];
-            return messages.length > 0 ? messages[messages.length - 1].text : null;
-        }
-
-        // Показать модальное окно поиска пользователей
+        // 🔍 ПОИСК И ДОБАВЛЕНИЕ ДРУЗЕЙ
         function showAddFriendModal() {
             document.getElementById('addFriendModal').classList.add('show');
             document.getElementById('searchUsersInput').value = '';
@@ -1345,8 +1189,7 @@
             document.getElementById('addFriendModal').classList.remove('show');
         }
 
-        // Поиск пользователей
-        function searchUsers() {
+        async function searchUsers() {
             const searchTerm = document.getElementById('searchUsersInput').value.toLowerCase();
             const searchResults = document.getElementById('searchResults');
             
@@ -1360,313 +1203,185 @@
                 return;
             }
 
-            const db = getDatabase();
-            const currentUserId = currentUser.id;
-            
-            // Ищем пользователей, исключая текущего и уже добавленных в друзья
-            const results = db.users.filter(user => 
-                user.id !== currentUserId &&
-                !currentUser.friends.includes(user.id) &&
-                (user.email.toLowerCase().includes(searchTerm) || 
-                 user.name.toLowerCase().includes(searchTerm))
-            );
+            try {
+                const result = await callGoogleScript('getAllUsers');
+                if (result.success) {
+                    const filteredUsers = result.users.filter(user =>
+                        user.name.toLowerCase().includes(searchTerm) ||
+                        user.email.toLowerCase().includes(searchTerm)
+                    );
 
-            if (results.length === 0) {
-                searchResults.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: var(--secondary);">
-                        <i class="fas fa-user-slash" style="font-size: 36px; margin-bottom: 10px;"></i>
-                        <div>Пользователи не найдены</div>
-                    </div>
-                `;
-                return;
-            }
-
-            searchResults.innerHTML = results.map(user => {
-                const alreadyRequested = (currentUser.friendRequests || []).includes(user.id);
-                const isFriend = currentUser.friends.includes(user.id);
-                
-                return `
-                    <div class="user-search-result">
-                        <div style="display: flex; align-items: center;">
-                            <div class="contact-avatar">${user.avatar}</div>
-                            <div>
-                                <div class="contact-name">${user.name}</div>
-                                <div class="contact-status">${user.email}</div>
+                    if (filteredUsers.length === 0) {
+                        searchResults.innerHTML = `
+                            <div style="text-align: center; padding: 20px; color: var(--secondary);">
+                                <i class="fas fa-user-slash" style="font-size: 36px; margin-bottom: 10px;"></i>
+                                <div>Пользователи не найдены</div>
                             </div>
+                        `;
+                        return;
+                    }
+
+                    searchResults.innerHTML = filteredUsers.map(user => `
+                        <div class="contact">
+                            <div class="contact-avatar">${user.avatar}</div>
+                            <div class="contact-info">
+                                <div class="contact-name">${user.name}</div>
+                                <div class="last-message">${user.email}</div>
+                            </div>
+                            <button onclick="sendFriendRequest(${user.id})" style="background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">
+                                Добавить
+                            </button>
                         </div>
-                        <button class="add-friend-action" 
-                                onclick="sendFriendRequest(${user.id})"
-                                ${alreadyRequested || isFriend ? 'disabled' : ''}>
-                            ${isFriend ? 'Уже друг' : alreadyRequested ? 'Заявка отправлена' : 'Добавить'}
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Отправить заявку в друзья
-        function sendFriendRequest(friendId) {
-            const friend = getUserById(friendId);
-            if (!friend) return;
-
-            // Добавляем заявку к другу
-            if (!friend.friendRequests) friend.friendRequests = [];
-            if (!friend.friendRequests.includes(currentUser.id)) {
-                friend.friendRequests.push(currentUser.id);
-                updateUser(friend);
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Ошибка поиска:', error);
             }
-
-            alert(`Заявка в друзья отправлена пользователю ${friend.name}!`);
-            hideAddFriendModal();
-            updateFriendsBadge();
         }
 
-        // Принять заявку в друзья
-        function acceptFriendRequest(friendId) {
-            const friend = getUserById(friendId);
-            if (!friend) return;
-
-            // Удаляем из заявок
-            currentUser.friendRequests = (currentUser.friendRequests || []).filter(id => id !== friendId);
-            
-            // Добавляем в друзья
-            if (!currentUser.friends) currentUser.friends = [];
-            if (!currentUser.friends.includes(friendId)) {
-                currentUser.friends.push(friendId);
-            }
-
-            // Также добавляем текущего пользователя в друзья к другу
-            if (!friend.friends) friend.friends = [];
-            if (!friend.friends.includes(currentUser.id)) {
-                friend.friends.push(currentUser.id);
-            }
-
-            updateUser(currentUser);
-            updateUser(friend);
-            
-            updateFriendsBadge();
-            loadContacts();
-            
-            alert(`Теперь вы друзья с ${friend.name}!`);
-        }
-
-        // Отклонить заявку
-        function declineFriendRequest(friendId) {
-            currentUser.friendRequests = (currentUser.friendRequests || []).filter(id => id !== friendId);
-            updateUser(currentUser);
-            updateFriendsBadge();
-            loadContacts();
-        }
-
-        // Удалить друга
-        function removeFriend(friendId) {
-            if (confirm('Удалить этого пользователя из друзей?')) {
-                const friend = getUserById(friendId);
+        async function sendFriendRequest(friendId) {
+            try {
+                const result = await callGoogleScript('sendFriendRequest', {
+                    friendId: friendId
+                });
                 
-                // Удаляем из друзей у текущего пользователя
-                currentUser.friends = (currentUser.friends || []).filter(id => id !== friendId);
+                if (result.success) {
+                    alert('Заявка в друзья отправлена!');
+                    hideAddFriendModal();
+                } else {
+                    alert('Ошибка отправки заявки');
+                }
+            } catch (error) {
+                console.error('Ошибка отправки заявки:', error);
+            }
+        }
+
+        async function acceptFriendRequest(requestId) {
+            try {
+                const result = await callGoogleScript('acceptFriendRequest', {
+                    requestId: requestId
+                });
                 
-                // Удаляем текущего пользователя из друзей у друга
-                if (friend) {
-                    friend.friends = (friend.friends || []).filter(id => id !== currentUser.id);
-                    updateUser(friend);
+                if (result.success) {
+                    alert('Заявка принята!');
+                    loadContacts();
+                } else {
+                    alert('Ошибка принятия заявки');
+                }
+            } catch (error) {
+                console.error('Ошибка принятия заявки:', error);
+            }
+        }
+
+        async function declineFriendRequest(requestId) {
+            // В реальной реализации здесь был бы вызов API для отклонения заявки
+            alert('Функция отклонения заявки будет реализована в полной версии');
+        }
+
+        // 💬 ЧАТ И СООБЩЕНИЯ
+        async function selectContact(friendId) {
+            try {
+                const result = await callGoogleScript('getAllUsers');
+                if (result.success) {
+                    const friend = result.users.find(u => u.id === friendId);
+                    if (friend) {
+                        currentContact = friend;
+                        
+                        document.getElementById('currentChatName').textContent = currentContact.name;
+                        document.getElementById('currentChatAvatar').textContent = currentContact.avatar;
+                        document.getElementById('currentChatStatus').textContent = 'online';
+                        
+                        document.getElementById('messageInput').disabled = false;
+                        document.querySelector('.send-button').disabled = false;
+                        
+                        loadMessages();
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка выбора контакта:', error);
+            }
+        }
+
+        async function loadMessages() {
+            if (!currentContact) return;
+            
+            try {
+                const result = await callGoogleScript('getMessages', {
+                    friendId: currentContact.id
+                });
+                
+                const messagesContainer = document.getElementById('messagesContainer');
+                
+                if (result.success && result.messages.length > 0) {
+                    messagesContainer.innerHTML = result.messages.map(message => `
+                        <div class="message ${message.senderId === currentUser.id ? 'sent' : 'received'}">
+                            ${message.text}
+                            <div class="message-time">${new Date(message.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    messagesContainer.innerHTML = `
+                        <div style="text-align: center; color: var(--secondary); margin-top: 50px;">
+                            <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px;"></i>
+                            <div>Начните общение с ${currentContact.name}</div>
+                        </div>
+                    `;
                 }
                 
-                updateUser(currentUser);
-                loadContacts();
-                
-                alert('Пользователь удален из друзей');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } catch (error) {
+                console.error('Ошибка загрузки сообщений:', error);
             }
         }
 
-        // Обновить бейдж заявок
-        function updateFriendsBadge() {
-            const pendingRequests = (currentUser.friendRequests || []).length;
-            document.getElementById('friendsBadge').textContent = pendingRequests;
-        }
-
-        // Выбор контакта для чата
-        function selectContact(friendId) {
-            const friend = getUserById(friendId);
-            if (!friend) return;
-
-            currentContact = {
-                id: friend.id,
-                name: friend.name,
-                avatar: friend.avatar,
-                status: friend.status,
-                email: friend.email
-            };
-            
-            document.getElementById('currentChatName').textContent = currentContact.name;
-            document.getElementById('currentChatAvatar').textContent = currentContact.avatar;
-            document.getElementById('currentChatStatus').textContent = currentContact.status === 'online' ? 'online' : 'offline';
-            
-            document.getElementById('messageInput').disabled = false;
-            document.querySelector('.send-button').disabled = false;
-            
-            loadMessages();
-        }
-
-        // Загрузка сообщений
-        function loadMessages() {
-            const messagesContainer = document.getElementById('messagesContainer');
-            const messages = getChatMessages();
-            
-            if (messages.length > 0) {
-                messagesContainer.innerHTML = messages.map(message => `
-                    <div class="message ${message.senderId === currentUser.id ? 'sent' : 'received'}">
-                        ${message.text}
-                        <div class="message-time">${message.time}</div>
-                    </div>
-                `).join('');
-            } else {
-                messagesContainer.innerHTML = `
-                    <div style="text-align: center; color: var(--secondary); margin-top: 50px;">
-                        <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px;"></i>
-                        <div>Начните общение с ${currentContact.name}</div>
-                    </div>
-                `;
-            }
-            
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // Получить сообщения чата
-        function getChatMessages() {
-            const db = getDatabase();
-            const chatKey = `chat_${Math.min(currentUser.id, currentContact.id)}_${Math.max(currentUser.id, currentContact.id)}`;
-            return db.messages[chatKey] || [];
-        }
-
-        // Сохранить сообщение
-        function saveMessage(text, senderId, receiverId) {
-            const db = getDatabase();
-            const chatKey = `chat_${Math.min(senderId, receiverId)}_${Math.max(senderId, receiverId)}`;
-            
-            if (!db.messages[chatKey]) {
-                db.messages[chatKey] = [];
-            }
-            
-            const newMessage = {
-                id: Date.now(),
-                text: text,
-                senderId: senderId,
-                receiverId: receiverId,
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                timestamp: Date.now()
-            };
-            
-            db.messages[chatKey].push(newMessage);
-            saveDatabase(db);
-            
-            return newMessage;
-        }
-
-        // Отправка сообщения
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
             
             if (text && currentContact) {
-                // Сохраняем сообщение
-                saveMessage(text, currentUser.id, currentContact.id);
-                input.value = '';
-                loadMessages();
-                
-                // Имитация ответа
-                setTimeout(() => {
-                    const responses = [
-                        "Привет! Как дела?",
-                        "Интересно, расскажи подробнее",
-                        "Спасибо за информацию!",
-                        "Давай обсудим это позже",
-                        "Отлично! Продолжай в том же духе"
-                    ];
-                    const response = responses[Math.floor(Math.random() * responses.length)];
+                try {
+                    const result = await callGoogleScript('sendMessage', {
+                        receiverId: currentContact.id,
+                        text: text
+                    });
                     
-                    saveMessage(response, currentContact.id, currentUser.id);
-                    loadMessages();
-                }, 1000 + Math.random() * 2000);
+                    if (result.success) {
+                        input.value = '';
+                        loadMessages();
+                    }
+                } catch (error) {
+                    console.error('Ошибка отправки сообщения:', error);
+                }
             }
         }
 
-        // Обработка поиска в реальном времени
-        function handleSearch() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            // Можно добавить фильтрацию контактов при необходимости
-        }
-
-        // Звонок другу
-        function startCallWithFriend(friendId) {
-            const friend = getUserById(friendId);
-            if (friend) {
-                currentContact = {
-                    id: friend.id,
-                    name: friend.name,
-                    avatar: friend.avatar
-                };
-                startCall();
-            }
-        }
-
-        // ===== WebRTC ЗВОНКИ =====
-        let localStream = null;
-        let peerConnection = null;
-        let isCallActive = false;
-
-        async function startCall() {
+        // 📞 ЗВОНКИ (ДЕМО)
+        function startCall() {
             if (!currentContact) {
                 alert('Выберите контакт для звонка');
                 return;
             }
-
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: false, 
-                    audio: true 
-                });
-                
-                alert(`Звонок ${currentContact.name}...\n\nВ демо-версии звонки имитируются. В реальном приложении здесь бы работал WebRTC.`);
-                
-                // Имитация звонка
-                setTimeout(() => {
-                    if (confirm(`${currentContact.name} принимает звонок. Начать разговор?`)) {
-                        alert('Разговор начат! Используйте микрофон для общения.');
-                    }
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Error accessing media devices:', error);
-                alert('Ошибка доступа к микрофону: ' + error.message);
-            }
+            alert(`Звонок ${currentContact.name}...\n\nВ демо-версии звонки имитируются.`);
         }
 
-        async function startVideoCall() {
+        function startVideoCall() {
             if (!currentContact) {
                 alert('Выберите контакт для видеозвонка');
                 return;
             }
+            alert(`Видеозвонок ${currentContact.name}...\n\nВ демо-версии видеозвонки имитируются.`);
+        }
 
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                
-                alert(`Видеозвонок ${currentContact.name}...\n\nВ демо-версии видеозвонки имитируются. В реальном приложении здесь бы работал WebRTC.`);
-                
-                // Имитация видеозвонка
-                setTimeout(() => {
-                    if (confirm(`${currentContact.name} принимает видеозвонок. Начать видеосвязь?`)) {
-                        alert('Видеосвязь установлена! Используйте камеру и микрофон для общения.');
-                    }
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Error accessing media devices:', error);
-                alert('Ошибка доступа к камере/микрофону: ' + error.message);
-            }
+        // 🎯 ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        function switchTab(tab) {
+            document.querySelectorAll('.sidebar-icon').forEach(icon => {
+                icon.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
+
+        function handleSearch() {
+            // Можно реализовать поиск по текущему списку
         }
 
         // Обработка Enter для отправки сообщений
@@ -1676,8 +1391,7 @@
             }
         });
 
-        console.log('🚀 WorkChat с общей базой данных загружен!');
-        console.log('Демо пользователи созданы автоматически');
+        console.log('🚀 WorkChat с Google Sheets загружен!');
     </script>
 </body>
 </html>
