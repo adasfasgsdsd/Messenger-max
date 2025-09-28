@@ -736,7 +736,7 @@
         // 🔧 КОНФИГУРАЦИЯ GOOGLE SHEETS
         const GOOGLE_SHEETS_CONFIG = {
             // ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ!
-            scriptUrl: 'https://script.google.com/macros/s/ВАШ_SCRIPT_ID/exec', // Ваш URL из Apps Script
+            scriptUrl: 'https://script.google.com/macros/s/AKfycby_ojsasezwNL-OVGaLEAMRRG94rZhD12LaxIzfgZsaVOa5cKgAIZdmL6dHqNn1ABfj/exec', // Ваш URL из Apps Script
             sheetId: '1-Hs7WP514HIYC5C52c2w1S7hmSK8aDes4fbXEavr1fE'
         };
 
@@ -763,10 +763,7 @@
         // 📋 ИНСТРУКЦИИ ПО НАСТРОЙКЕ
         function showSetupInstructions() {
             const instructions = `
-                <strong>Для работы приложения необходимо:</strong><br>
-                1. Создать Google Sheets таблицу<br>
-                2. Настроить Google Apps Script<br>
-                3. Вставить ваши ID в конфигурацию<br><br>
+                
                 <a href="#" onclick="showDetailedSetup()">Подробная инструкция по настройке</a>
             `;
             document.getElementById('setupInfo').innerHTML = instructions;
